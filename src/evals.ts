@@ -22,7 +22,7 @@ const FIXTURES: EvalFixture[] = [
   {
     name: "technical-rag",
     query:
-      "How does RAG use MemoryVectorStore and Titan embeddings in this project?",
+      "How does file RAG chunk markdown and cite sources in this project?",
     expectedRoute: "technical",
   },
   {
@@ -57,7 +57,8 @@ function isJsonRoundTripValid(result: AgentResult): boolean {
       typeof record.query === "string" &&
       typeof record.route === "string" &&
       typeof record.answer === "string" &&
-      Array.isArray(record.documents)
+      Array.isArray(record.documents) &&
+      Array.isArray(record.citations)
     );
   } catch {
     return false;
@@ -96,6 +97,13 @@ function runDeterministicChecks(
       result.route !== "technical" || result.documents.length > 0,
       result.route === "technical"
         ? `${result.documents.length} retrieved docs`
+        : "not a RAG route",
+    ),
+    check(
+      "citations_non_empty_for_rag",
+      result.route !== "technical" || result.citations.length > 0,
+      result.route === "technical"
+        ? `${result.citations.length} citations`
         : "not a RAG route",
     ),
     check(

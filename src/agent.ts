@@ -8,8 +8,15 @@ import type { MemoryVectorStore } from "@langchain/classic/vectorstores/memory";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { createChatModel } from "./bedrock.js";
 import { formatError } from "./config.js";
-import { retrieveContext } from "./rag/store.js";
-import { isRoute, type AgentResult, type Route } from "./types.js";
+import {
+  citationsFromChunks,
+  citationsAreGrounded,
+} from "./rag/citations.js";
+import {
+  formatChunksForPrompt,
+  retrieveChunks,
+} from "./rag/store.js";
+import { isRoute, type AgentResult, type Citation, type Route } from "./types.js";
 
 const AgentState = Annotation.Root({
   query: Annotation<string>(),
@@ -19,6 +26,10 @@ const AgentState = Annotation.Root({
   }),
   documents: Annotation<string[]>({
     reducer: (_left: string[], right: string[]) => right,
+    default: () => [],
+  }),
+  citations: Annotation<Citation[]>({
+    reducer: (_left: Citation[], right: Citation[]) => right,
     default: () => [],
   }),
   answer: Annotation<string>({
@@ -58,34 +69,36 @@ function routerNode(state: AgentStateType): { route: Route } {
 async function ragNode(
   state: AgentStateType,
   store: MemoryVectorStore,
-): Promise<{ documents: string[]; answer: string }> {
+): Promise<{ documents: string[]; citations: Citation[]; answer: string }> {
   try {
-    const documents = await retrieveContext(store, state.query);
-    const context =
-      documents.length > 0
-        ? documents.map((doc, index) => `[${index + 1}] ${doc}`).join("\n\n")
-        : "No retrieved documents.";
+    const chunks = await retrieveChunks(store, state.query);
+    const context = formatChunksForPrompt(chunks);
+    const citations = citationsFromChunks(chunks);
 
     const model = createChatModel({ temperature: 0, maxTokens: 800 });
     const response = await model.invoke([
       new SystemMessage(
-        "You are a grounded technical assistant. Answer using ONLY the provided context. If the context is insufficient, say so. Do not invent facts.",
+        "You are a grounded technical assistant. Answer using ONLY the provided context. Cite supporting chunks as [1], [2], etc. If the context is insufficient, say so. Do not invent files or facts.",
       ),
       new HumanMessage(`Context:\n${context}\n\nQuestion: ${state.query}`),
     ]);
 
-    const answer = response.text.trim();
+    let answer = response.text.trim();
     if (answer === "") {
-      return {
-        documents,
-        answer: "The model returned an empty RAG answer.",
-      };
+      answer = "The model returned an empty RAG answer.";
+    } else if (!citationsAreGrounded(answer, chunks)) {
+      answer = `${answer}\n\n(Note: some citations were not in the retrieved set.)`;
     }
 
-    return { documents, answer };
+    return {
+      documents: chunks.map((chunk) => `${chunk.source}: ${chunk.content}`),
+      citations,
+      answer,
+    };
   } catch (error: unknown) {
     return {
       documents: [],
+      citations: [],
       answer: `RAG node failed: ${formatError(error)}`,
     };
   }
@@ -93,7 +106,7 @@ async function ragNode(
 
 async function generalNode(
   state: AgentStateType,
-): Promise<{ documents: string[]; answer: string }> {
+): Promise<{ documents: string[]; citations: Citation[]; answer: string }> {
   try {
     const model = createChatModel({ temperature: 0.2, maxTokens: 600 });
     const response = await model.invoke([
@@ -106,6 +119,7 @@ async function generalNode(
     const answer = response.text.trim();
     return {
       documents: [],
+      citations: [],
       answer:
         answer === ""
           ? "The model returned an empty general answer."
@@ -114,6 +128,7 @@ async function generalNode(
   } catch (error: unknown) {
     return {
       documents: [],
+      citations: [],
       answer: `General node failed: ${formatError(error)}`,
     };
   }
@@ -158,6 +173,7 @@ export async function invokeAgent(
     query: state.query,
     route: state.route,
     documents: state.documents,
+    citations: state.citations,
     answer: state.answer,
   };
 }

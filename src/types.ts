@@ -1,10 +1,16 @@
 export const ROUTES = ["technical", "operational"] as const;
 export type Route = (typeof ROUTES)[number];
 
+export interface Citation {
+  id: string;
+  source: string;
+}
+
 export interface AgentResult {
   query: string;
   route: Route;
   documents: string[];
+  citations: Citation[];
   answer: string;
 }
 

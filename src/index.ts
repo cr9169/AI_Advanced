@@ -8,7 +8,7 @@ const DEFAULT_QUERY =
 async function main(): Promise<void> {
   const query = process.argv.slice(2).join(" ").trim() || DEFAULT_QUERY;
 
-  console.log("Indexing seed documents into MemoryVectorStore...");
+  console.log("Indexing knowledge/ into MemoryVectorStore via Titan...");
   const store = await createVectorStore();
   const graph = buildAgent(store);
 
@@ -16,7 +16,15 @@ async function main(): Promise<void> {
   const result = await invokeAgent(graph, query);
 
   console.log(`route: ${result.route}`);
-  console.log("retrieved documents:");
+  console.log("citations:");
+  if (result.citations.length === 0) {
+    console.log("  (none)");
+  } else {
+    for (const citation of result.citations) {
+      console.log(`  - ${citation.id}`);
+    }
+  }
+  console.log("retrieved chunks:");
   if (result.documents.length === 0) {
     console.log("  (none)");
   } else {
