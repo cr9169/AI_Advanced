@@ -1,0 +1,74 @@
+[
+  {
+    "id": "router-langgraph",
+    "query": "How does the LangGraph router choose RAG vs general?",
+    "expectedRoute": "technical",
+    "expectedSourceSubstr": "langgraph.md"
+  },
+  {
+    "id": "file-rag-chunk",
+    "query": "How does file RAG chunk markdown and cite sources?",
+    "expectedRoute": "technical",
+    "expectedSourceSubstr": "rag.md"
+  },
+  {
+    "id": "titan-embed",
+    "query": "Which Titan embeddings model does RAG use?",
+    "expectedRoute": "technical",
+    "expectedSourceSubstr": "rag.md"
+  },
+  {
+    "id": "mcp-sidecar",
+    "query": "Does the LangGraph agent call MCP tools today?",
+    "expectedRoute": "technical",
+    "expectedSourceSubstr": "mcp.md"
+  },
+  {
+    "id": "mcp-metrics",
+    "query": "What does the get_system_metrics MCP tool return?",
+    "expectedRoute": "technical",
+    "expectedSourceSubstr": "mcp.md"
+  },
+  {
+    "id": "haiku-default",
+    "query": "Why does this project use Claude Haiku on Bedrock instead of Sonnet?",
+    "expectedRoute": "technical",
+    "expectedSourceSubstr": "bedrock.md"
+  },
+  {
+    "id": "account-verify",
+    "query": "What happens if Bedrock InvokeModel is blocked for account verification?",
+    "expectedRoute": "technical",
+    "expectedSourceSubstr": "bedrock.md"
+  },
+  {
+    "id": "deterministic-nodes",
+    "query": "Which LangGraph nodes must not call Bedrock?",
+    "expectedRoute": "technical",
+    "expectedSourceSubstr": "langgraph.md"
+  },
+  {
+    "id": "cite-metadata",
+    "query": "How should RAG citations use source metadata?",
+    "expectedRoute": "technical",
+    "expectedSourceSubstr": "rag.md"
+  },
+  {
+    "id": "profile-baruser",
+    "query": "Which AWS CLI profile and IAM user does Bedrock use?",
+    "expectedRoute": "technical",
+    "expectedSourceSubstr": "bedrock.md"
+  },
+  {
+    "id": "ops-latency",
+    "query": "What should I check first during a latency incident with high CPU?",
+    "expectedRoute": "operational",
+    "expectedSourceSubstr": "runbook-latency.md"
+  },
+  {
+    "id": "ops-deploy",
+    "query": "When users report high latency after a deploy, what operational signals come first?",
+    "expectedRoute": "operational",
+    "expectedSourceSubstr": "runbook-latency.md"
+  }
+]

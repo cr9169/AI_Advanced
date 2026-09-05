@@ -1,8 +1,9 @@
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
 import { z } from "zod";
-import { buildAgent, classifyQuery, invokeAgent } from "./agent.js";
+import { buildAgent, classifyQuery } from "./agent.js";
 import { createChatModel } from "./bedrock.js";
 import { EVAL_TIMEOUT_MS, formatError } from "./config.js";
+import { runWithHarness } from "./harness.js";
 import { createVectorStore } from "./rag/store.js";
 import type {
   AgentResult,
@@ -58,7 +59,8 @@ function isJsonRoundTripValid(result: AgentResult): boolean {
       typeof record.route === "string" &&
       typeof record.answer === "string" &&
       Array.isArray(record.documents) &&
-      Array.isArray(record.citations)
+      Array.isArray(record.citations) &&
+      Array.isArray(record.toolTrace)
     );
   } catch {
     return false;
@@ -192,7 +194,7 @@ async function main(): Promise<void> {
   for (const fixture of FIXTURES) {
     console.log(`Evaluating ${fixture.name}...`);
     const started = Date.now();
-    const result = await invokeAgent(graph, fixture.query);
+    const result = await runWithHarness(graph, fixture.query);
     const durationMs = Date.now() - started;
     const checks = runDeterministicChecks(fixture, result, durationMs);
 

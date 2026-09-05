@@ -11,6 +11,7 @@ export interface AgentResult {
   route: Route;
   documents: string[];
   citations: Citation[];
+  toolTrace: string[];
   answer: string;
 }
 

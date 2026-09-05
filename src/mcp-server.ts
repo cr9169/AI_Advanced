@@ -2,6 +2,8 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { formatError } from "./config.js";
+import { readDocument, searchKnowledge } from "./knowledge/files.js";
+import { ReadDocumentArgs, SearchKnowledgeArgs } from "./tools/knowledge.js";
 
 const GetSystemMetricsInput = z.object({
   host: z
@@ -33,9 +35,16 @@ function dummyMetrics(host: string): SystemMetrics {
   };
 }
 
-function createMetricsServer(): McpServer {
+function textResult(text: string, isError = false) {
+  return {
+    isError,
+    content: [{ type: "text" as const, text }],
+  };
+}
+
+function createKnowledgeServer(): McpServer {
   const server = new McpServer({
-    name: "system-metrics",
+    name: "knowledge-agent",
     version: "1.0.0",
   });
 
@@ -48,25 +57,52 @@ function createMetricsServer(): McpServer {
     },
     async ({ host }) => {
       try {
-        const metrics = dummyMetrics(host ?? "localhost");
-        return {
-          content: [
-            {
-              type: "text",
-              text: JSON.stringify(metrics, null, 2),
-            },
-          ],
-        };
+        return textResult(JSON.stringify(dummyMetrics(host ?? "localhost"), null, 2));
       } catch (error: unknown) {
-        return {
-          isError: true,
-          content: [
-            {
-              type: "text",
-              text: `get_system_metrics failed: ${formatError(error)}`,
-            },
-          ],
-        };
+        return textResult(
+          `get_system_metrics failed: ${formatError(error)}`,
+          true,
+        );
+      }
+    },
+  );
+
+  server.registerTool(
+    "read_document",
+    {
+      description:
+        "Read a markdown/text file from the local knowledge directory. Path is relative, e.g. rag.md.",
+      inputSchema: ReadDocumentArgs,
+    },
+    async ({ path }) => {
+      try {
+        return textResult(await readDocument(path));
+      } catch (error: unknown) {
+        return textResult(`read_document failed: ${formatError(error)}`, true);
+      }
+    },
+  );
+
+  server.registerTool(
+    "search_knowledge",
+    {
+      description:
+        "Deterministic keyword search over local knowledge files (no embeddings).",
+      inputSchema: SearchKnowledgeArgs,
+    },
+    async ({ query }) => {
+      try {
+        const hits = await searchKnowledge(query);
+        return textResult(
+          hits.length === 0
+            ? "No knowledge files matched."
+            : JSON.stringify(hits, null, 2),
+        );
+      } catch (error: unknown) {
+        return textResult(
+          `search_knowledge failed: ${formatError(error)}`,
+          true,
+        );
       }
     },
   );
@@ -75,10 +111,10 @@ function createMetricsServer(): McpServer {
 }
 
 async function main(): Promise<void> {
-  const server = createMetricsServer();
+  const server = createKnowledgeServer();
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("system-metrics MCP server running on stdio");
+  console.error("knowledge-agent MCP server running on stdio");
 }
 
 main().catch((error: unknown) => {

@@ -1,5 +1,6 @@
-import { buildAgent, invokeAgent } from "./agent.js";
+import { buildAgent } from "./agent.js";
 import { formatError } from "./config.js";
+import { runWithHarness } from "./harness.js";
 import { createVectorStore } from "./rag/store.js";
 
 const DEFAULT_QUERY =
@@ -13,7 +14,7 @@ async function main(): Promise<void> {
   const graph = buildAgent(store);
 
   console.log(`Running query: ${query}\n`);
-  const result = await invokeAgent(graph, query);
+  const result = await runWithHarness(graph, query);
 
   console.log(`route: ${result.route}`);
   console.log("citations:");
@@ -22,6 +23,12 @@ async function main(): Promise<void> {
   } else {
     for (const citation of result.citations) {
       console.log(`  - ${citation.id}`);
+    }
+  }
+  if (result.toolTrace.length > 0) {
+    console.log("toolTrace:");
+    for (const item of result.toolTrace) {
+      console.log(`  - ${item}`);
     }
   }
   console.log("retrieved chunks:");

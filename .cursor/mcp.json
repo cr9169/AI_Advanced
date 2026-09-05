@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "system-metrics": {
+    "knowledge-agent": {
       "command": "npx",
       "args": ["tsx", "src/mcp-server.ts"]
     }

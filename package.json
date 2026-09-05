@@ -5,12 +5,15 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "setup": "npm install && npm run typecheck",
+    "setup": "npm install && npm install --prefix infra && npm run typecheck",
     "start": "tsx src/index.ts",
     "smoke": "tsx src/smoke.ts",
     "mcp": "tsx src/mcp-server.ts",
     "eval": "tsx src/evals.ts",
-    "typecheck": "tsc --noEmit"
+    "eval:offline": "tsx src/evals-offline.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "cdk:synth": "npm run synth --prefix infra"
   },
   "keywords": [
     "rag",
@@ -33,6 +36,7 @@
   "devDependencies": {
     "@types/node": "^26.4.0",
     "tsx": "^4.23.13",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^2.1.9"
   }
 }

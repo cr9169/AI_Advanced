@@ -1,6 +1,8 @@
 # dependencies & build
 node_modules/
 dist/
+cdk.out/
+infra/cdk.out/
 *.tsbuildinfo
 
 # secrets

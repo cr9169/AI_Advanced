@@ -15,6 +15,28 @@ export const RAG_TOP_K = 4;
 export const CHUNK_SIZE = 900;
 export const CHUNK_OVERLAP = 150;
 export const EVAL_TIMEOUT_MS = 60_000;
+export const HARNESS_MAX_STEPS = Number.parseInt(
+  process.env.HARNESS_MAX_STEPS ?? "6",
+  10,
+);
+export const HARNESS_TIMEOUT_MS = Number.parseInt(
+  process.env.HARNESS_TIMEOUT_MS ?? "60000",
+  10,
+);
+
+export function configureLangSmith(): void {
+  const enabled = process.env.LANGCHAIN_TRACING_V2 === "true";
+  const key = process.env.LANGCHAIN_API_KEY;
+  if (enabled && key !== undefined && key !== "") {
+    process.env.LANGCHAIN_TRACING_V2 = "true";
+    process.env.LANGCHAIN_PROJECT =
+      process.env.LANGCHAIN_PROJECT ?? "ai-advanced";
+    return;
+  }
+  process.env.LANGCHAIN_TRACING_V2 = "false";
+}
+
+configureLangSmith();
 
 export function formatError(error: unknown): string {
   if (error instanceof Error) {

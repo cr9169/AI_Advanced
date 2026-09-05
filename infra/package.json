@@ -1,0 +1,18 @@
+{
+  "name": "ai-advanced-infra",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "synth": "cdk synth",
+    "deploy": "cdk deploy --profile ai-advanced",
+    "diff": "cdk diff --profile ai-advanced"
+  },
+  "devDependencies": {
+    "aws-cdk": "^2.1029.0",
+    "aws-cdk-lib": "^2.202.0",
+    "constructs": "^10.4.2",
+    "tsx": "^4.19.0",
+    "typescript": "^5.9.0"
+  }
+}
