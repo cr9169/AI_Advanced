@@ -1,19 +1,28 @@
 {
   "name": "ai_advanced",
   "version": "1.0.0",
+  "private": true,
   "description": "Modular TypeScript lab for RAG, LangGraph, MCP, deterministic nodes, and evals on AWS Bedrock.",
   "type": "module",
-  "main": "dist/index.js",
+  "workspaces": [
+    "apps/*",
+    "infra"
+  ],
   "scripts": {
-    "setup": "npm install && npm install --prefix infra && npm run typecheck",
-    "start": "tsx src/index.ts",
-    "smoke": "tsx src/smoke.ts",
-    "mcp": "tsx src/mcp-server.ts",
-    "eval": "tsx src/evals.ts",
-    "eval:offline": "tsx src/evals-offline.ts",
-    "test": "vitest run",
-    "typecheck": "tsc --noEmit",
-    "cdk:synth": "npm run synth --prefix infra"
+    "setup": "npm install && npm run typecheck",
+    "start": "npm run start -w api",
+    "smoke": "npm run smoke -w api",
+    "mcp": "npm run mcp -w api",
+    "ingest": "npm run ingest -w api",
+    "api": "npm run api -w api",
+    "ui": "npm run dev -w web",
+    "db:up": "docker compose up -d",
+    "dev": "docker compose up -d && npm run api",
+    "eval": "npm run eval -w api",
+    "eval:offline": "npm run eval:offline -w api",
+    "test": "npm run test -w api",
+    "typecheck": "npm run typecheck -w api",
+    "cdk:synth": "npm run synth -w ai-advanced-infra"
   },
   "keywords": [
     "rag",
@@ -23,20 +32,5 @@
     "evals"
   ],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@langchain/aws": "^1.4.4",
-    "@langchain/classic": "^1.0.45",
-    "@langchain/core": "^1.2.9",
-    "@langchain/langgraph": "^1.4.13",
-    "@modelcontextprotocol/sdk": "^1.30.0",
-    "dotenv": "^17.4.2",
-    "zod": "^3.25.76"
-  },
-  "devDependencies": {
-    "@types/node": "^26.4.0",
-    "tsx": "^4.23.13",
-    "typescript": "^7.0.2",
-    "vitest": "^2.1.9"
-  }
+  "license": "ISC"
 }

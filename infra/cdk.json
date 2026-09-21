@@ -3,5 +3,8 @@
   "watch": {
     "include": ["**"],
     "exclude": ["README.md", "cdk*.json", "cdk.out", "node_modules"]
+  },
+  "context": {
+    "cliUser": "BarUser"
   }
 }

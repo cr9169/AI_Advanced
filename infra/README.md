@@ -1,27 +1,20 @@
 # Infra (CDK)
 
-Low-cost S3 bucket for knowledge files. **Do not deploy until you mean to create AWS resources.**
+Private S3 bucket for knowledge originals, plus an IAM managed policy attached to IAM user `BarUser` (`s3:ListBucket`, `GetObject`, `PutObject`, `DeleteObject`).
 
-Profile: `ai-advanced`. Region: `us-east-1`.
+**No RDS, Lambda, or OpenSearch.** Query/ingest run on your PC against Docker pgvector.
 
-```powershell
-cd infra
-npm install
-npx cdk synth
-```
-
-From the repo root:
+From the repo root (`npm install` already covers this workspace):
 
 ```powershell
 npm run cdk:synth
 ```
 
-Deploy (creates a versioned private bucket `knowledge-{account}-us-east-1`):
+Deploy (creates `knowledge-{account}-us-east-1`):
 
 ```powershell
-cd infra
 npx cdk bootstrap aws://ACCOUNT/us-east-1 --profile ai-advanced
 npx cdk deploy --profile ai-advanced
 ```
 
-No RDS, Lambda, or OpenSearch in this stack.
+Do not deploy unless you intend to create that bucket.

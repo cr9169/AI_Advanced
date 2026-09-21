@@ -1,0 +1,15 @@
+---
+description: API layering, harness, and conventional file names
+globs: apps/api/**
+alwaysApply: false
+---
+
+# apps/api
+
+Layers: `shared` (cross-layer helpers), `domain`, `application`, `infrastructure`, `interfaces`.
+
+- Do not name a file after one function. Use `types.ts`, `constants.ts`, `schemas.ts`, `utils.ts`, or `middleware.ts` in the owning folder.
+- Helpers used by every layer go in `src/shared/` (`formatError`, `REPO_ROOT`).
+- Graph tools allowlist: `read_document`, `search_knowledge` only. Metrics stay on MCP.
+- Express: `interfaces/http/app.ts`, `routes.ts`, one `middleware.ts`.
+- `.env`, `knowledge/`, and `evals/` resolve from repo root via `REPO_ROOT`.

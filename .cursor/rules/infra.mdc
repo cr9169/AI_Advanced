@@ -1,0 +1,11 @@
+---
+description: CDK infra is S3+IAM only
+globs: infra/**
+alwaysApply: false
+---
+
+# infra
+
+S3 bucket plus IAM for `BarUser`. No RDS, Lambda, or OpenSearch.
+
+Synth is fine (`npm run cdk:synth`). Do not deploy unless the user explicitly asks.

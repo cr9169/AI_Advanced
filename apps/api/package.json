@@ -1,0 +1,39 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "smoke": "tsx src/interfaces/smoke.ts",
+    "mcp": "tsx src/interfaces/mcp/server.ts",
+    "ingest": "tsx src/interfaces/cli/ingest.ts",
+    "api": "tsx src/server.ts",
+    "eval": "tsx src/interfaces/evals/evals.ts",
+    "eval:offline": "tsx src/interfaces/evals/evals-offline.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.864.0",
+    "@langchain/aws": "^1.4.4",
+    "@langchain/classic": "^1.0.45",
+    "@langchain/core": "^1.2.9",
+    "@langchain/langgraph": "^1.4.13",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^4.22.3",
+    "pg": "^8.16.3",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^4.17.25",
+    "@types/node": "^26.4.0",
+    "@types/pg": "^8.15.5",
+    "tsx": "^4.23.13",
+    "typescript": "^7.0.2",
+    "vitest": "^2.1.9"
+  }
+}

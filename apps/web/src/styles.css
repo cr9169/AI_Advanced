@@ -1,0 +1,46 @@
+:root {
+  font-family: Segoe UI, system-ui, sans-serif;
+  color: #0f172a;
+  background: #f8fafc;
+}
+
+body {
+  margin: 0;
+}
+
+.page {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 0 1rem 3rem;
+}
+
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem;
+  font: inherit;
+}
+
+.row {
+  display: flex;
+  gap: 0.75rem;
+  margin: 0.75rem 0;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  font: inherit;
+  cursor: pointer;
+}
+
+.hint,
+.status {
+  color: #475569;
+}
+
+.answer {
+  white-space: pre-wrap;
+  background: #fff;
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+}

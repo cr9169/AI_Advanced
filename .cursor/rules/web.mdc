@@ -1,0 +1,11 @@
+---
+description: Vite UI conventions for the local knowledge agent
+globs: apps/web/**
+alwaysApply: false
+---
+
+# apps/web
+
+Vite + React on 5173. API default is `http://localhost:8787`.
+
+No router and no auth. Put DTOs and URL constants in `src/shared`. Keep fetch plus `errorMessage` in `src/api.ts`; do not add a one-function `utils.ts`.

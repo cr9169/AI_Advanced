@@ -2,7 +2,7 @@
   "mcpServers": {
     "knowledge-agent": {
       "command": "npx",
-      "args": ["tsx", "src/mcp-server.ts"]
+      "args": ["tsx", "apps/api/src/interfaces/mcp/server.ts"]
     }
   }
 }

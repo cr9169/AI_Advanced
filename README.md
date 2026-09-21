@@ -1,31 +1,52 @@
 # AI_Advanced
 
-Local TypeScript lab for **file RAG**, LangGraph, MCP, a small **agent harness**, offline evals, and optional AWS CDK (S3). Chat: Claude Haiku 4.5. Embeddings: Titan Text Embeddings V2. Region: `us-east-1`. Profile: `ai-advanced`.
+Personal knowledge agent: file RAG, LangGraph, MCP, harness, Docker **pgvector**, local React UI, optional S3 via CDK.
 
-## Setup
+Layout: `apps/api` (Express), `apps/web` (Vite), `infra` (CDK S3+IAM), `knowledge/` and `evals/` at the repo root.
 
-1. Copy `.env.example` to `.env`.
-2. `aws sts get-caller-identity --profile ai-advanced`
-3. Bedrock: Anthropic use-case form once. New accounts may block `InvokeModel` until AWS verification finishes.
-4. `npm run setup`
+Chat: Claude Haiku 4.5. Embeddings: Titan Text Embeddings V2 (`1024` dims). Region: `us-east-1`. Profile: `ai-advanced`.
 
-LangSmith is optional: set `LANGCHAIN_TRACING_V2=true` and `LANGCHAIN_API_KEY` when you have a key. Leave tracing false until `npm run smoke` works.
+## Daily flow (local)
 
-## Commands that work without Bedrock
+1. Docker Desktop running (engine must be up; `db:up` fails if the Docker pipe is missing)
+2. `npm run setup`
+3. `npm run db:up`
+4. After Bedrock verification: `npm run smoke` then `npm run ingest`
+5. `npm run api` and in another terminal `npm run ui`
+6. Open http://localhost:5173
 
-- `npm test` — unit tests (chunking, router, citations, MCP-equivalent tools)
-- `npm run eval:offline` — golden file search + router checks (no LLM)
-- `npm run mcp` — stdio MCP: `read_document`, `search_knowledge`, `get_system_metrics`
-- `npm run cdk:synth` — synthesize the S3 stack (**does not deploy**)
+CLI still works: `npm start`
 
-## Commands that need Bedrock
+## Backend layout
 
-- `npm run smoke` — Titan + Haiku ping
-- `npm start` — index `knowledge/`, harness-capped agent (retrieve → tools loop → generate)
-- `npm run eval` — live graph + LLM-as-judge
+Express HTTP API under `apps/api/src/`:
 
-## Infra
+- `shared/` — helpers used across layers (`formatError`, `REPO_ROOT`)
+- `domain/` — types, chunking, citations, keyword ranking (no I/O)
+- `application/` — agent graph, harness, ingest and query use cases
+- `infrastructure/` — Bedrock, Postgres, local files, S3
+- `interfaces/` — Express, CLI, MCP, evals, smoke
+- `server.ts` / `index.ts` — HTTP listen and CLI composition roots
 
-See [infra/README.md](infra/README.md). Do not `cdk deploy` until you want a real S3 bucket.
+Do not name a file after a single function. Cross-layer helpers go in `shared/`; otherwise use `types.ts`, `constants.ts`, `schemas.ts`, `utils.ts`, or `middleware.ts` in the owning folder.
 
-Drop more `.md` files in `knowledge/` and re-run tests / start.
+## Without Bedrock
+
+- `npm test`
+- `npm run eval:offline`
+- `npm run mcp`
+- `npm run cdk:synth` (does **not** deploy)
+
+## S3 originals
+
+CDK stack is S3 + IAM for `BarUser` only. No RDS/Lambda.
+
+```powershell
+npm run cdk:synth
+```
+
+Deploy only when you ask. Then set `KNOWLEDGE_BUCKET=knowledge-ACCOUNT-us-east-1` and upload keys under `knowledge/`.
+
+## Env
+
+See `.env.example`. `DATABASE_URL` points at Docker Postgres. `.env` and `knowledge/` resolve from the repo root even when scripts run in `apps/api`.
