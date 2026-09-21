@@ -13,7 +13,7 @@ npm workspaces: `apps/api` (Express + LangGraph), `apps/web` (Vite React), `infr
 
 ## Layout rules
 
-Do not name a file after one function. If a helper is used by every layer in `apps/api`, put it in `apps/api/src/shared/`. Otherwise keep `types.ts`, `constants.ts`, `schemas.ts`, `utils.ts`, or `middleware.ts` in the owning folder (no prefixes like `http.constants.ts`).
+Details and examples are in `.cursor/rules/` (`conventions`, `api-layers`, `api`, `web`, `infra`). Short version: do not name a file after one function. A helper used by every layer in `apps/api` goes in `apps/api/src/shared/`. Otherwise use `types.ts`, `constants.ts`, `schemas.ts`, `utils.ts`, or `middleware.ts` in the owning folder (no prefixes like `http.constants.ts`).
 
 Web DTOs stay in `apps/web/src/shared`; there is no `packages/shared` package.
 

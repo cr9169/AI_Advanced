@@ -1,11 +1,19 @@
 ---
-description: CDK infra is S3+IAM only
+description: CDK stack is S3 and IAM only; do not deploy unprompted
 globs: infra/**
 alwaysApply: false
 ---
 
-# infra
+# Infra
 
-S3 bucket plus IAM for `BarUser`. No RDS, Lambda, or OpenSearch.
+`KnowledgeBucketStack` is a private S3 bucket plus one managed policy on IAM user `BarUser` (`s3:ListBucket`, `GetObject`, `PutObject`, `DeleteObject`). The user is imported, so attach with `CfnManagedPolicy.users`. `addManagedPolicy()` on an imported user fails.
 
-Synth is fine (`npm run cdk:synth`). Do not deploy unless the user explicitly asks.
+Do not add RDS, Lambda, OpenSearch, or a VPC. Query and ingest run on the PC against Docker pgvector.
+
+`npm run cdk:synth` from the repo root is fine. Do not run `cdk deploy` or `cdk bootstrap` unless the user explicitly asks. Bucket name is `knowledge-{account}-{region}`; object keys use the `knowledge/` prefix.
+
+```ts
+// Bad: new rds.DatabaseInstance(...) or lambda.Function in this stack
+// Bad: importedUser.addManagedPolicy(policy)
+// Good: (policy.node.defaultChild as iam.CfnManagedPolicy).users = [userName]
+```

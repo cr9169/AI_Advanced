@@ -1,0 +1,22 @@
+---
+description: Which API layer may import which
+globs: apps/api/**
+alwaysApply: false
+---
+
+# API layer boundaries
+
+`domain` is pure: types, chunking, citations, keyword ranking. It does not import `application`, `infrastructure`, `interfaces`, or `shared`, and it does not touch disk, Postgres, Bedrock, Express, or S3.
+
+`infrastructure` implements ports from `domain` (for example `KnowledgeStore` in `domain/rag/types.ts`). It may import `domain` and `shared`. It does not import `application` or `interfaces`.
+
+`application` is the graph, harness, tools, ingest, and query. It may import `domain`, `infrastructure`, and `shared`. It does not import `interfaces`.
+
+`interfaces` (HTTP, CLI, MCP, evals, smoke) compose use cases. They do not reimplement chunking or ranking. `shared` imports nothing from the other layers.
+
+```ts
+// Bad: domain/rag/chunk.ts reading files or calling Bedrock
+// Bad: infrastructure/rag/pg-store.ts importing application/query.ts
+// Good: pg-store implements KnowledgeStore and maps rows to RetrievedChunk
+// Good: interfaces/http/routes.ts calls runQuery and ingestKnowledge
+```

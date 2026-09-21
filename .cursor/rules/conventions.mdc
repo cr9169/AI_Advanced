@@ -1,0 +1,21 @@
+---
+description: File names and where shared helpers live
+globs: apps/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# File layout
+
+Do not name a file after one function. Group by role in the owning folder: `types.ts`, `constants.ts`, `schemas.ts`, `utils.ts`, or `middleware.ts`. No prefixes (`http.constants.ts`, `mcp.schema.ts`).
+
+A helper used by every layer in `apps/api` goes in `apps/api/src/shared/`. A helper used by one folder stays in that folder, even if the file has a single export. Two related helpers may share `utils.ts`.
+
+Web DTOs and URL constants stay in `apps/web/src/shared`. Do not add `packages/shared`. `knowledge/` and `evals/` stay at the repo root.
+
+```ts
+// Bad: apps/api/src/domain/errors.ts with only formatError
+// Bad: apps/api/src/interfaces/http/async-handler.ts
+// Good: formatError in apps/api/src/shared/utils.ts (every layer imports it)
+// Good: isRoute next to Route in domain/types.ts
+// Good: splitParagraphs stays private inside domain/rag/chunk.ts
+```

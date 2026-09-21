@@ -1,15 +1,21 @@
 ---
-description: API layering, harness, and conventional file names
+description: Agent graph, tool allowlist, Express API, and repo-root paths
 globs: apps/api/**
 alwaysApply: false
 ---
 
-# apps/api
+# API behavior
 
-Layers: `shared` (cross-layer helpers), `domain`, `application`, `infrastructure`, `interfaces`.
+Graph tools are only `read_document` and `search_knowledge` (`application/tools/constants.ts`). `get_system_metrics` is registered on the MCP server (`interfaces/mcp/server.ts`) and must stay off the graph allowlist. A disallowed tool throws `Disallowed tool: …`, which the harness maps to `disallowed_tool`.
 
-- Do not name a file after one function. Use `types.ts`, `constants.ts`, `schemas.ts`, `utils.ts`, or `middleware.ts` in the owning folder.
-- Helpers used by every layer go in `src/shared/` (`formatError`, `REPO_ROOT`).
-- Graph tools allowlist: `read_document`, `search_knowledge` only. Metrics stay on MCP.
-- Express: `interfaces/http/app.ts`, `routes.ts`, one `middleware.ts`.
-- `.env`, `knowledge/`, and `evals/` resolve from repo root via `REPO_ROOT`.
+The harness (`application/harness.ts`) rejects an empty query, enforces `HARNESS_MAX_STEPS` and `HARNESS_TIMEOUT_MS`, and is the only place that turns those failures into `HarnessError`. HTTP maps `empty_query` to 400.
+
+Express stays in `interfaces/http/`: `app.ts` builds the app, `routes.ts` is `/api/health`, `/api/ingest`, and `/api/query`, and `middleware.ts` holds the API key check, async wrapper, and error handler. Do not split those into one file per function.
+
+`.env`, `knowledge/`, and `evals/` resolve from the git root via `REPO_ROOT` in `shared/constants.ts`. Do not use `process.cwd()` or a relative `knowledge/` path; workspace scripts run with cwd `apps/api`.
+
+```ts
+// Bad: executeKnowledgeTool("get_system_metrics", …) added to GRAPH_TOOL_ALLOWLIST
+// Bad: readFile("evals/golden.json") with a cwd-relative path
+// Good: path.join(REPO_ROOT, "evals/golden.json")
+```

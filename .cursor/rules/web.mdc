@@ -1,11 +1,19 @@
 ---
-description: Vite UI conventions for the local knowledge agent
+description: Local Vite UI boundaries and where client types live
 globs: apps/web/**
 alwaysApply: false
 ---
 
-# apps/web
+# Web UI
 
-Vite + React on 5173. API default is `http://localhost:8787`.
+Vite + React on port 5173. One screen in `App.tsx`: query textarea, Ask, Ingest, route, answer, citations, tool trace. No router, no auth UI, no component library.
 
-No router and no auth. Put DTOs and URL constants in `src/shared`. Keep fetch plus `errorMessage` in `src/api.ts`; do not add a one-function `utils.ts`.
+The client talks only to the local API (`VITE_API_URL`, default `http://localhost:8787`) through `src/api.ts`. Do not import `apps/api` source. Response shapes (`QueryResult`, `IngestResult`) live in `src/shared/types.ts`. `API_URL` and `DEFAULT_QUERY` live in `src/shared/constants.ts`.
+
+`errorMessage` stays in `src/api.ts` next to `queryAgent` and `ingestKnowledge`. Do not add `src/utils.ts` for that one function.
+
+```tsx
+// Bad: import { AgentResult } from "../../api/src/domain/types"
+// Bad: apps/web/src/utils.ts exporting only errorMessage
+// Good: import type { QueryResult } from "./shared/types"
+```
